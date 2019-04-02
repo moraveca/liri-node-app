@@ -46,7 +46,6 @@ if (process.argv[2] === "movie-this") {
             console.log("Title: ", title);
         }
         
-        // title = process.argv[3];
     }
 
     axios.get("http://www.omdbapi.com/?t=" + title + "&y=&plot=short&apikey=trilogy").then(
