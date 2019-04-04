@@ -13,10 +13,12 @@ var moment = require('moment');
 var fs = require('fs');
 
 
+
 var randomCommand = "";
 var song = "The Sign";
 var title = "mr+nobody";
 var artist = "";
+var now = moment().format("dddd, MMMM Do YYYY, h:mm:ss a");
 
 
 if (process.argv[2] === "do-what-it-says") {
@@ -30,7 +32,7 @@ if (process.argv[2] === "do-what-it-says") {
         randomCommand = spliced[0];
 
         if (randomCommand === "concert-this") {
-            artist = spliced[1].replace(/ /g, "+").replace(/"/g, "");
+            artist = spliced[1].replace(/"/g, "");
             // console.log("artist: ", artist);
             runCommand();
         } else if (randomCommand === "movie-this") {
@@ -61,11 +63,25 @@ function runCommand() {
             artistArray = musicArray.join();
             // console.log("Artist array: ", artistArray);
 
-            artist = artistArray.replace(/,/g, "+");
+            // var logArtist = artistArray.replace(/,/g, " ");
+            // // console.log("logArtist: ", logArtist)
+
+            // fs.appendFile('log.txt', "  (" + now + ")  Artist: " + logArtist, function (err) {
+            //     if (err) throw err;
+            // });
+
+
+            artist = artistArray.replace(/,/g, " ");
             // console.log("Artist: ", artist);
         } else if (process.argv.length < 4 && randomCommand === "") {
             return console.log("Sorry, you need to pick a band...");
         }
+
+        fs.appendFile('log.txt', "  (" + now + ")  Artist: " + artist, function (err) {
+            if (err) throw err;
+        });
+
+        artist.replace(/ /g, "+");
 
         queryURL = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp";
         // console.log("artist query: ", queryURL)
@@ -79,6 +95,14 @@ function runCommand() {
                     var concertDate = moment(response.data[i].datetime).format("MM/DD/YYYY");
                     console.log("Date: ", concertDate);
                     console.log("");
+
+
+                    fs.appendFile('log.txt', "; Concert venue: " + response.data[i].venue.name +
+                        "; City: " + response.data[i].venue.city + "; Date: " + concertDate
+                        , function (err) {
+                            if (err) throw err;
+                        });
+
                 }
             }
         );
@@ -108,9 +132,16 @@ function runCommand() {
                 console.log("The Rotten Tomatoes rating is " + response.data.Ratings[1].Value);
                 console.log(response.data.Title + " was produced in " + response.data.Country);
                 console.log(response.data.Title + " is in the language of " + response.data.Language);
-                console.log(response.data.Title + " came out in " + response.data.Year);
                 console.log(response.data.Plot);
-                console.log(response.data.Title + " stars " + response.data.Actors)
+                console.log(response.data.Title + " stars " + response.data.Actors);
+
+                fs.appendFile('log.txt', "  (" + now + ")  Movie: " + response.data.Title + "; Year: " +
+                    response.data.Year + "; IMDB rating: " + response.data.imdbRating +
+                    "; Rotten Tomatoes rating: " + response.data.Ratings[1].Value +
+                    "; Country: " + response.data.Country + "; Language: " + response.data.Language +
+                    "; Plot: " + response.data.Plot + "; Stars: " + response.data.Actors, function (err) {
+                        if (err) throw err;
+                    });
             }
         );
     }
@@ -142,6 +173,13 @@ function runCommand() {
                 console.log("Song: ", artistOptions[0].name);
                 console.log("Preview link: ", artistOptions[0].external_urls.spotify);
                 console.log("Album: ", artistOptions[0].album.name);
+
+                fs.appendFile('log.txt', "  (" + now + ")   Artist: " +
+                    artistOptions[0].artists[0].name + "; Song: " + artistOptions[0].name +
+                    "; Preview link: " + artistOptions[0].external_urls.spotify + "; Album: "
+                    + artistOptions[0].album.name, function (err) {
+                        if (err) throw err;
+                    });
             }
 
             if (process.argv.length <= 3) {
@@ -150,7 +188,16 @@ function runCommand() {
                         console.log("Artist: ", artistOptions[j].artists[0].name);
                         console.log("Song: ", artistOptions[j].name);
                         console.log("Preview link: ", artistOptions[j].external_urls.spotify);
-                        return console.log("Album: ", artistOptions[j].album.name);
+                        console.log("Album: ", artistOptions[j].album.name);
+
+                        fs.appendFile('log.txt', "  (" + now + ")   Artist: " +
+                            artistOptions[j].artists[0].name + "; Song: " + artistOptions[j].name +
+                            "; Preview link: " + artistOptions[j].external_urls.spotify + "; Album: "
+                            + artistOptions[j].album.name, function (err) {
+                                if (err) throw err;
+                            });
+                        return;
+
                     }
                 }
             } else {
@@ -158,6 +205,14 @@ function runCommand() {
                 console.log("Song: ", artistOptions[0].name);
                 console.log("Preview link: ", artistOptions[0].external_urls.spotify);
                 console.log("Album: ", artistOptions[0].album.name);
+
+                fs.appendFile('log.txt', "  (" + now + ")   Artist: " +
+                artistOptions[0].artists[0].name + "; Song: " + artistOptions[0].name +
+                "; Preview link: " + artistOptions[0].external_urls.spotify + "; Album: "
+                + artistOptions[0].album.name, function (err) {
+                    if (err) throw err;
+                });
+
             }
         });
     };
@@ -165,3 +220,10 @@ function runCommand() {
 }
 
 runCommand();
+
+if (process.argv[2] === "clear-log") {
+    fs.writeFile('log.txt', "", function (err) {
+        if (err) throw err;
+        console.log("The log has been cleared!");
+      });
+}
