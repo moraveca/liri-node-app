@@ -20,7 +20,7 @@ This will print general information about, "The Lady Eve," in your console as we
 
 ## concert-this
 
-This function uses the BandsInTown API to search for upcoming concerts for specified bands. You will have to choose a band you'd like to search for, say, "Rolling Stones," and type this in your terminal:
+This function uses the Bands in Town API to search for upcoming concerts for specified bands. You will have to choose a band you'd like to search for, say, "Rolling Stones," and type this in your terminal:
 
 node liri.js concert-this rolling stones
 
