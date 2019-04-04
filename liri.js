@@ -43,11 +43,8 @@ if (process.argv[2] === "concert-this") {
 
                 var concertDate = moment(response.data[i].datetime).format("MM/DD/YYYY");
 
-                console.log("moment date: ", concertDate);
-                
-
-                // console.log("moment: ", moment(concertDate, "MM/DD/YYYY"));
-
+                console.log("Date: ", concertDate);
+                console.log("");
             }
         }
     );
@@ -88,30 +85,50 @@ if (process.argv[2] === "movie-this") {
 
 if (process.argv[2] === "spotify-this-song") {
 
-    // spotify.search({ type: 'track', query: 'All the Small Things' }, function(err, data) {
-    //     if (err) {
-    //       return console.log('Error occurred: ' + err);
-    //     }
-
-    //   console.log(data); 
-    //   });
-
-
-    var title = "mr+nobody";
+    var song = "The Sign";
 
     if (process.argv.length >= 4) {
-        var queryArray = [];
+        var searchArray = [];
 
         for (i = 3; i < process.argv.length; i++) {
 
-            queryArray.push(process.argv[i]);
-            titleArray = queryArray.join();
-            console.log("Title array: ", titleArray);
-            title = titleArray.replace(/,/g, "+");
-            console.log("Title: ", title);
+            searchArray.push(process.argv[i]);
+            var songArray = searchArray.join();
+            song = songArray.replace(/,/g, " ");
         }
 
     }
 
+    spotify.search({ type: 'track', query: song }, function (err, data) {
+        if (err) {
+            return console.log('Error occurred: ' + err);
+        }
 
+        var artistOptions = data.tracks.items;
+
+        if (process.argv.length <= 3) {
+            for (j = 0; j < artistOptions.length; j++) {
+                if (artistOptions[j].artists[0].name === "Ace of Base") {
+                    console.log("Artist: ", artistOptions[j].artists[0].name);
+                    console.log("Song: ", artistOptions[j].name);
+                    console.log("Preview link: ", artistOptions[j].external_urls.spotify);
+                    return console.log("Album: ", artistOptions[j].album.name);
+                }
+            }
+        } else {
+            console.log("Artist: ", artistOptions[0].artists[0].name);
+            console.log("Song: ", artistOptions[0].name);
+            console.log("Preview link: ", artistOptions[0].external_urls.spotify);
+            console.log("Album: ", artistOptions[0].album.name);
 }
+
+
+    });
+
+    
+}
+
+
+
+
+
